@@ -1,2 +1,2 @@
-# e-com-api
-E commerce api with GO
+# go-crud-api
+CRUD api with GO
