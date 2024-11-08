@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -12,25 +11,27 @@ import (
 	"time"
 
 	"github.com/sachin-gautam/go-crud-api/internal/config"
+	student "github.com/sachin-gautam/go-crud-api/internal/http/handlers"
 )
 
 func main() {
 	//load config
 	cfg := config.MustLoad()
+
 	//setup database
+
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Crud API"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
+
 	//setup server
 	server := http.Server{
 		Addr:    cfg.Address,
 		Handler: router,
 	}
 
-	fmt.Printf("Sever Started %s", cfg.HttpServer.Address)
+	slog.Info("Server started", slog.String("address:", cfg.Address))
 
 	done := make(chan os.Signal, 1)
 
