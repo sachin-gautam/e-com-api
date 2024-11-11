@@ -12,6 +12,7 @@ import (
 
 	"github.com/sachin-gautam/go-crud-api/internal/config"
 	student "github.com/sachin-gautam/go-crud-api/internal/http/handlers"
+	"github.com/sachin-gautam/go-crud-api/internal/storage/mysql"
 )
 
 func main() {
@@ -19,11 +20,15 @@ func main() {
 	cfg := config.MustLoad()
 
 	//setup database
+	if _, err := mysql.New(cfg); err != nil {
+		log.Fatal(err)
+	}
+	slog.Info("storage initialized", slog.String("env", cfg.Env))
 
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /api/students", student.New())
+	router.HandleFunc("POST /api/students", student.Create)
 
 	//setup server
 	server := http.Server{
