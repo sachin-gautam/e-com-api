@@ -2,8 +2,10 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/sachin-gautam/go-crud-api/internal/config"
+	"github.com/sachin-gautam/go-crud-api/internal/dtypes"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -54,4 +56,23 @@ func (m *Mysql) CreateStudent(name string, email string, age int) (int64, error)
 	}
 
 	return lastId, nil
+}
+
+func (m *Mysql) GetStudentById(id int64) (dtypes.Student, error) {
+	stmt, err := m.Db.Prepare("SELECT * FROM students WHERE id = ? LIMIT 1")
+	if err != nil {
+		return dtypes.Student{}, err
+	}
+
+	defer stmt.Close()
+
+	var student dtypes.Student
+
+	if err = stmt.QueryRow(id).Scan(&student.Id, &student.Name, &student.Email, &student.Age); err != nil {
+		if err == sql.ErrNoRows {
+			return dtypes.Student{}, fmt.Errorf("no studen with id %s ", fmt.Sprint(id))
+		}
+		return dtypes.Student{}, fmt.Errorf("query error: %w", err)
+	}
+	return student, nil
 }
