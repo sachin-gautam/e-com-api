@@ -20,7 +20,8 @@ func main() {
 	cfg := config.MustLoad()
 
 	//setup database
-	if _, err := mysql.New(cfg); err != nil {
+	storage, err := mysql.New(cfg)
+	if err != nil {
 		log.Fatal(err)
 	}
 	slog.Info("storage initialized", slog.String("env", cfg.Env))
@@ -28,7 +29,7 @@ func main() {
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /api/students", student.Create)
+	router.HandleFunc("POST /api/students", student.New(storage))
 
 	//setup server
 	server := http.Server{

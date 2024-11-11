@@ -8,11 +8,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type Sqlite struct {
+type Mysql struct {
 	Db *sql.DB
 }
 
-func New(cfg *config.Config) (*Sqlite, error) {
+func New(cfg *config.Config) (*Mysql, error) {
 	db, err := sql.Open("mysql", cfg.StoragePath)
 	if err != nil {
 		return nil, err
@@ -28,8 +28,30 @@ func New(cfg *config.Config) (*Sqlite, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Sqlite{
+	return &Mysql{
 		Db: db,
 	}, nil
 
+}
+
+func (m *Mysql) CreateStudent(name string, email string, age int) (int64, error) {
+
+	stmt, err := m.Db.Prepare("INSERT INTO students (name, email, age) VALUES (?, ?, ?)")
+	if err != nil {
+		return 0, err
+	}
+
+	defer stmt.Close()
+
+	result, err := stmt.Exec(name, email, age)
+	if err != nil {
+		return 0, err
+	}
+
+	lastId, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return lastId, nil
 }
