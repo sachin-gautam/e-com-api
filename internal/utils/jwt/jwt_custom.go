@@ -2,22 +2,21 @@ package jwtutil
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("hjsdiU2dTYP5q3JvhVtBsiPxU7Y6eTQ78wHto9vqjRw=")
+var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
-// Claims represents the payload that will be encoded in the JWT
 type Claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
-// GenerateToken generates a new JWT token for a given username
 func GenerateToken(username string) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour) // Token valid for 24 hours
+	expirationTime := time.Now().Add(24 * time.Hour)
 
 	claims := &Claims{
 		Username: username,
@@ -35,7 +34,6 @@ func GenerateToken(username string) (string, error) {
 	return tokenString, nil
 }
 
-// ValidateToken parses and validates a JWT token string
 func ValidateToken(tokenString string) (*Claims, error) {
 	claims := &Claims{}
 

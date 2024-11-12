@@ -8,7 +8,6 @@ import (
 	jwtutil "github.com/sachin-gautam/go-crud-api/internal/utils/jwt"
 )
 
-// AuthMiddleware checks the JWT in the Authorization header
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
