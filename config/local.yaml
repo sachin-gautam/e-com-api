@@ -1,5 +1,0 @@
-env : "dev"
-storage_path: "root:root@tcp(localhost:3306)/crud_api"
-http_server:
-  address: "localhost:8082"
-  
