@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sachin-gautam/go-crud-api/internal/config"
-	"github.com/sachin-gautam/go-crud-api/internal/dtypes"
+	"github.com/sachin-gautam/go-crud-api/internal/model"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -58,26 +58,26 @@ func (m *Mysql) CreateStudent(name string, email string, age int) (int64, error)
 	return lastId, nil
 }
 
-func (m *Mysql) GetStudentById(id int64) (dtypes.Student, error) {
+func (m *Mysql) GetStudentById(id int64) (model.Student, error) {
 	stmt, err := m.Db.Prepare("SELECT * FROM students WHERE id = ? LIMIT 1")
 	if err != nil {
-		return dtypes.Student{}, err
+		return model.Student{}, err
 	}
 
 	defer stmt.Close()
 
-	var student dtypes.Student
+	var student model.Student
 
 	if err = stmt.QueryRow(id).Scan(&student.Id, &student.Name, &student.Email, &student.Age); err != nil {
 		if err == sql.ErrNoRows {
-			return dtypes.Student{}, fmt.Errorf("no studen with id %s ", fmt.Sprint(id))
+			return model.Student{}, fmt.Errorf("no studen with id %s ", fmt.Sprint(id))
 		}
-		return dtypes.Student{}, fmt.Errorf("query error: %w", err)
+		return model.Student{}, fmt.Errorf("query error: %w", err)
 	}
 	return student, nil
 }
 
-func (m *Mysql) GetList() ([]dtypes.Student, error) {
+func (m *Mysql) GetList() ([]model.Student, error) {
 	stmt, err := m.Db.Prepare("SELECT id, name, email, age FROM students")
 	if err != nil {
 		return nil, err
@@ -91,10 +91,10 @@ func (m *Mysql) GetList() ([]dtypes.Student, error) {
 
 	defer rows.Close()
 
-	var students []dtypes.Student
+	var students []model.Student
 
 	for rows.Next() {
-		var student dtypes.Student
+		var student model.Student
 
 		if err := rows.Scan(&student.Id, &student.Name, &student.Email, &student.Age); err != nil {
 			return nil, err
@@ -104,15 +104,15 @@ func (m *Mysql) GetList() ([]dtypes.Student, error) {
 	return students, nil
 }
 
-func (m *Mysql) UpdateById(id int64, name string, email string, age int) (dtypes.Student, error) {
+func (m *Mysql) UpdateById(id int64, name string, email string, age int) (model.Student, error) {
 	stmt, err := m.Db.Prepare("UPDATE students SET name = ?, email = ?, age = ? WHERE id = ?")
 	if err != nil {
-		return dtypes.Student{}, fmt.Errorf("prepare error: %w", err)
+		return model.Student{}, fmt.Errorf("prepare error: %w", err)
 	}
 	defer stmt.Close()
 	_, err = stmt.Exec(name, email, age, id)
 	if err != nil {
-		return dtypes.Student{}, fmt.Errorf("execution error: %w", err)
+		return model.Student{}, fmt.Errorf("execution error: %w", err)
 	}
 
 	return m.GetStudentById(id)

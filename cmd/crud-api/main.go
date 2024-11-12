@@ -31,17 +31,10 @@ func main() {
 
 	studentHandler := student.NewStudentHandler(storage)
 	router.HandleFunc("POST /api/students", studentHandler.Create)
-
-	studentHandler = student.GetStudentHandler(storage)
 	router.HandleFunc("GET /api/students/{id}", studentHandler.Get)
-
-	studentHandler = student.GetStudentListHandler(storage)
 	router.HandleFunc("GET /api/students", studentHandler.GetList)
-
-	studentHandler = student.UpdateStudentHandler(storage)
 	router.HandleFunc("PUT /api/students/update/{id}", studentHandler.Update)
-
-	router.HandleFunc("DELETE /api/students/delete/{id}", student.DeleteById(storage))
+	router.HandleFunc("DELETE /api/students/delete/{id}", studentHandler.Delete)
 
 	//setup server
 	server := http.Server{

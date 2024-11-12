@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/go-playground/validator"
-	"github.com/sachin-gautam/go-crud-api/internal/dtypes"
+	"github.com/sachin-gautam/go-crud-api/internal/model"
 	"github.com/sachin-gautam/go-crud-api/internal/storage"
 	"github.com/sachin-gautam/go-crud-api/internal/utils/response"
 )
@@ -22,22 +22,11 @@ type StudentHandler struct {
 func NewStudentHandler(storage storage.Storage) StudentHandler {
 	return StudentHandler{storage}
 }
-func GetStudentHandler(storage storage.Storage) StudentHandler {
-	return StudentHandler{storage}
-}
-func GetStudentListHandler(storage storage.Storage) StudentHandler {
-	return StudentHandler{storage}
-}
-func UpdateStudentHandler(storage storage.Storage) StudentHandler {
-	return StudentHandler{storage}
-}
-func DeleteStudentHandler(storage storage.Storage) StudentHandler {
-	return StudentHandler{storage}
-}
+
 func (h StudentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	slog.Info("Creating a Student")
 
-	var student dtypes.Student
+	var student model.Student
 
 	err := json.NewDecoder(r.Body).Decode(&student)
 
@@ -112,7 +101,7 @@ func (h StudentHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var student dtypes.Student
+	var student model.Student
 	if err := json.NewDecoder(r.Body).Decode(&student); err != nil {
 		response.WriteJson(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("invalid request payload: %w", err)))
 		return
@@ -152,26 +141,4 @@ func (h StudentHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.WriteJson(w, http.StatusOK, map[string]int64{"deleted_id": deletedId})
-}
-
-func DeleteById(storage storage.Storage) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
-		slog.Info("deleting a student", slog.String("id", id))
-
-		intId, err := strconv.ParseInt(id, 10, 64)
-		if err != nil {
-			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(fmt.Errorf("invalid student ID")))
-			return
-		}
-
-		deletedId, err := storage.DeleteById(intId)
-		if err != nil {
-			slog.Error("error deleting student", slog.String("id", id))
-			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
-			return
-		}
-
-		response.WriteJson(w, http.StatusOK, map[string]int64{"deleted_id": deletedId})
-	}
 }
