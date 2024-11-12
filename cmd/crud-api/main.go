@@ -12,6 +12,7 @@ import (
 
 	"github.com/sachin-gautam/go-crud-api/internal/config"
 	student "github.com/sachin-gautam/go-crud-api/internal/http/handlers"
+	"github.com/sachin-gautam/go-crud-api/internal/middleware"
 	"github.com/sachin-gautam/go-crud-api/internal/storage/mysql"
 )
 
@@ -28,13 +29,15 @@ func main() {
 
 	//setup router
 	router := http.NewServeMux()
-
 	studentHandler := student.NewStudentHandler(storage)
-	router.HandleFunc("POST /api/students", studentHandler.Create)
+
+	router.HandleFunc("POST /api/login", studentHandler.Login)
+
+	router.HandleFunc("POST /api/students", middleware.AuthMiddleware(studentHandler.Create))
 	router.HandleFunc("GET /api/students/{id}", studentHandler.Get)
 	router.HandleFunc("GET /api/students", studentHandler.GetList)
-	router.HandleFunc("PUT /api/students/update/{id}", studentHandler.Update)
-	router.HandleFunc("DELETE /api/students/delete/{id}", studentHandler.Delete)
+	router.HandleFunc("PUT /api/students/update/{id}", middleware.AuthMiddleware(studentHandler.Update))
+	router.HandleFunc("DELETE /api/students/delete/{id}", middleware.AuthMiddleware(studentHandler.Delete))
 
 	//setup server
 	server := http.Server{
