@@ -29,10 +29,18 @@ func main() {
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /api/students", student.New(storage))
-	router.HandleFunc("GET /api/students/{id}", student.GetById(storage))
-	router.HandleFunc("GET /api/students", student.GetList(storage))
-	router.HandleFunc("PUT /api/students/update/{id}", student.UpdateById(storage))
+	studentHandler := student.NewStudentHandler(storage)
+	router.HandleFunc("POST /api/students", studentHandler.Create)
+
+	studentHandler = student.GetStudentHandler(storage)
+	router.HandleFunc("GET /api/students/{id}", studentHandler.Get)
+
+	studentHandler = student.GetStudentListHandler(storage)
+	router.HandleFunc("GET /api/students", studentHandler.GetList)
+
+	studentHandler = student.UpdateStudentHandler(storage)
+	router.HandleFunc("PUT /api/students/update/{id}", studentHandler.Update)
+
 	router.HandleFunc("DELETE /api/students/delete/{id}", student.DeleteById(storage))
 
 	//setup server
