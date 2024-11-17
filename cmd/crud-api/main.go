@@ -33,6 +33,8 @@ func main() {
 
 	router.HandleFunc("POST /api/login", studentHandler.Login)
 
+	router.HandleFunc("GET /api/external", studentHandler.GetJson)
+
 	router.HandleFunc("POST /api/students", middleware.AuthMiddleware(studentHandler.Create))
 	router.HandleFunc("GET /api/students/{id}", studentHandler.Get)
 	router.HandleFunc("GET /api/students", studentHandler.GetList)
